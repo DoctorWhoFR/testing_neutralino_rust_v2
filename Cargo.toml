@@ -1,0 +1,25 @@
+[package]
+name = "elec_rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+tera = "1.19.1"
+typetag = "0.2.14"
+websocket = { version=  "0.27.0", features = ["sync"] }
+tokio = { version = "1.35.0", features = ["rt", "rt-multi-thread", "macros", "net", "tokio-macros", "time", "sync"] }
+env_logger = "0.10.1"
+tokio-tungstenite = "0.21.0"
+futures-util = "0.3.29"
+log = "0.4.20"
+colored = { version = "2.1.0", features = [] }
+image = { version = "0.24.7", features = [] }
+time = { version = "0.1.45", features = [] }
+console = "0.15.7"
+config = { version = "0.13.4", features = [] }
+screenshots = "0.8.5"
+enigo = "0.1.3"
