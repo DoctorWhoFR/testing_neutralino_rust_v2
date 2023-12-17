@@ -32,7 +32,7 @@ fn init_core(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) -> Resu
 
     println!("{}", rendered);
 
-    let write_res = fs::write("./front/core.js", rendered);
+    let write_res = fs::write("./myapp/resources/core.js", rendered);
 
     match write_res {
         Ok(_) => {}
@@ -50,8 +50,8 @@ pub fn init_electron(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>)
     init_core(events, handlers, invokes).expect("test");
     println!("spawned");
 
-    Command::new("npm.cmd")
-        .args(["run", "start"])
-        .current_dir("./front")
+    Command::new("neu.cmd")
+        .args(["run"])
+        .current_dir("./myapp")
         .spawn()
 }
