@@ -1,6 +1,6 @@
 use std::path::{PathBuf, Path};
 use std::{fs, env};
-use std::process::{Child, Command, ExitCode};
+use std::process::{Child, Command, ExitCode, Stdio};
 use tera::Tera;
 use dotenv::dotenv;
 
@@ -62,6 +62,7 @@ pub async fn init_electron(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<
         Command::new("neu.cmd")
         .args(["run"])
         .current_dir("./myapp")
+        .stdout(Stdio::null())
         .spawn()
         .expect("test");
     } else {
