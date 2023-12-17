@@ -80,3 +80,4 @@ window.core.invokes.StopSignal = (kind) => window.core.invoke({  id: "StopSignal
 
 
 console.log("Core system V0.1")
+console.log("Available core: ", window.core)

@@ -7,7 +7,10 @@ use tokio::sync::{Mutex, RwLock};
 use typemap_rev::{TypeMap, TypeMapKey};
 use crate::electron::init_electron;
 use crate::message_handler::message_handler;
+use crate::message_kind::BasicMessage;
+use crate::pingpong::PingPong;
 use crate::tcp_listener::retrieve_connection;
+use dotenv::dotenv;
 
 mod electron;
 mod init_message;
@@ -27,21 +30,20 @@ impl TypeMapKey for GlobalState {
     type Value = GlobalState;
 }
 
-#[tokio::test]
-async fn test(){
-    let mut connection_counter = 0;
-    let core = init_electron(
+#[tokio::main]
+async fn main(){
+    dotenv().ok();
+    let _ = init_electron(
         vec![],
         vec!["PingPong", "Screenshot"],
         vec!["StopSignal"]
-    );
+    ).await;
 
+    tokio::time::sleep(Duration::from_millis(1000)).await;
     'main: loop {
-        let (writer, mut read) = retrieve_connection().await;
-        let arc_writer = Arc::new(Mutex::new(writer));
 
-        println!("connection established {}", connection_counter);
-        connection_counter = connection_counter + 1;
+        let (writer, read) = retrieve_connection().await;
+        let arc_writer = Arc::new(Mutex::new(writer));
 
         let arc_state = Arc::new(RwLock::new(TypeMap::new()));
         arc_state.write().await.insert::<GlobalState>(GlobalState {
@@ -53,14 +55,10 @@ async fn test(){
         loop {
             let global_lock = arc_state.read().await;
             let state = global_lock.get::<GlobalState>().unwrap();
-            println!("{:?}", state);
             if state.stop_state {
-                println!("received stop signal break");
                 break 'main;
             }
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
     }
-    println!("connection loop ended trow stop signal")
-
 }

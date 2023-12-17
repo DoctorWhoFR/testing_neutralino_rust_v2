@@ -1,9 +1,11 @@
-use std::fs;
-use std::process::{Child, Command, exit, ExitCode};
+use std::path::{PathBuf, Path};
+use std::{fs, env};
+use std::process::{Child, Command, ExitCode};
 use tera::Tera;
+use dotenv::dotenv;
 
 fn init_core(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) -> Result<(), ExitCode>{
-    let mut tera = Tera::new("templates/**/*.txt");
+    let tera = Tera::new("templates/**/*.txt");
 
     let tera = match tera {
         Ok(tera) => tera,
@@ -30,8 +32,6 @@ fn init_core(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) -> Resu
         }
     };
 
-    println!("{}", rendered);
-
     let write_res = fs::write("./myapp/resources/core.js", rendered);
 
     match write_res {
@@ -46,12 +46,35 @@ fn init_core(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) -> Resu
     Ok(())
 }
 
-pub fn init_electron(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) -> std::io::Result<Child> {
-    init_core(events, handlers, invokes).expect("test");
-    println!("spawned");
+fn get_path() {
+    let path = Path::new("./myapp/myapp-win_x64.exe");
+    println!("{:?}", path.canonicalize());
+}
 
-    Command::new("neu.cmd")
+pub async fn init_electron(events: Vec<&str>, handlers: Vec<&str>, invokes: Vec<&str>) {
+    dotenv().ok();
+   
+    let build_env = std::env::var("BUILD_ENV").unwrap_or_else(|_| "dev".to_string());
+    if build_env == "dev" {
+        init_core(events, handlers, invokes).expect("test");
+        println!("spawing electron");
+        
+        Command::new("neu.cmd")
         .args(["run"])
         .current_dir("./myapp")
         .spawn()
+        .expect("test");
+    } else {
+        println!("{:?}", env::current_dir());
+        let path = Path::new("./myapp/myapp-win_x64.exe");
+        println!("{:?}", path.canonicalize());
+
+        Command::new(path.canonicalize().unwrap().to_str().unwrap())
+        .spawn()
+        .expect("fe");
+    }
+
+   
+
+    println!("spawned");
 }

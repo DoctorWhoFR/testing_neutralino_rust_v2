@@ -76,3 +76,4 @@ window.core.invokes.{{event}} = (kind) => window.core.invoke({  id: "{{event}}",
 {% endfor %}
 
 console.log("Core system V0.1")
+console.log("Available core: ", window.core)
